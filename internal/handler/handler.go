@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/pocwithmehul/common-go-lib"
+	commonlogger "github.com/pocwithmehul/common-go-lib/pkg/logger"
 	"github.com/segmentio/kafka-go"
 )
 
@@ -17,7 +17,7 @@ type StockEvent struct {
 	Volume    int64     `json:"volume"`
 }
 
-func CallbackHandler(writer *kafka.Writer, logger *commonlib.Logger) http.HandlerFunc {
+func CallbackHandler(writer *kafka.Writer, logger *commonlogger.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var event StockEvent
 		if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
