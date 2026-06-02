@@ -7,20 +7,25 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/pocwithmehul/common-go-lib"
+	commonlogger "github.com/pocwithmehul/common-go-lib/pkg/logger"
+	"github.com/pocwithmehul/stock-webhook-service/internal/config"
 	"github.com/pocwithmehul/stock-webhook-service/internal/handler"
 	"github.com/pocwithmehul/stock-webhook-service/internal/messaging"
 )
 
 func main() {
-	cfg, err := commonlib.LoadConfig()
+	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("load config: %v", err)
 	}
 
-	logger := commonlib.NewLogger("stock-webhook-service", cfg.Datadog)
+	logger := commonlogger.NewLogger("stock-webhook-service", cfg.Datadog)
 	writer := messaging.NewKafkaWriter(cfg)
-	defer writer.Close()
+	defer func() {
+		if err := writer.Close(); err != nil {
+			logger.Error("kafka writer close failed", map[string]interface{}{"error": err.Error()})
+		}
+	}()
 
 	router := mux.NewRouter()
 	router.HandleFunc("/v1/stock/callbacks", handler.CallbackHandler(writer, logger)).Methods(http.MethodPost)
