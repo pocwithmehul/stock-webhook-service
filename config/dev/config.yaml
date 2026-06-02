@@ -1,0 +1,15 @@
+server:
+  port: 8090
+kafka:
+  brokers:
+    - kafka:9092
+  topic: stock-ticker-event
+datadog:
+  apiKey: ""
+  site: datadoghq.com
+  env: development
+tokenAuthorization:
+  validIssuers:
+    - login.myorg.com
+  validAudience:
+    - myorgstockapp
